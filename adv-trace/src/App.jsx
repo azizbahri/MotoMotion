@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { Suspense, lazy, useMemo } from "react";
 import {
   LayoutDashboard,
   Activity as ActivityIcon,
@@ -7,13 +7,14 @@ import {
   History,
 } from "lucide-react";
 import Sidebar from "./components/Sidebar";
-import Dashboard from "./views/Dashboard";
-import Telemetry from "./views/Telemetry";
-import TuningLab from "./views/TuningLab";
-import Garage from "./views/Garage";
-import Library from "./views/Library";
 import useStore, { BIKE_PROFILES } from "./store/useStore";
 import { generateMockSession } from "./physics/engine";
+
+const Dashboard = lazy(() => import("./views/Dashboard"));
+const Telemetry = lazy(() => import("./views/Telemetry"));
+const TuningLab = lazy(() => import("./views/TuningLab"));
+const Garage = lazy(() => import("./views/Garage"));
+const Library = lazy(() => import("./views/Library"));
 
 export default function App() {
   const {
@@ -88,32 +89,40 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           <div className="max-w-6xl mx-auto">
-            {activeTab === "dashboard" && <Dashboard activeSession={activeSession} />}
-            {activeTab === "telemetry" && (
-              <Telemetry rawTelemetry={activeSession?.data || []} profile={activeProfile} />
-            )}
-            {activeTab === "tuning" && (
-              <TuningLab
-                settings={settings}
-                setSettings={setSettings}
-                rawTelemetry={activeSession?.data || []}
-                profile={activeProfile}
-              />
-            )}
-            {activeTab === "garage" && (
-              <Garage
-                profiles={BIKE_PROFILES}
-                activeProfileId={activeProfileId}
-                onSelectProfile={setActiveProfileId}
-              />
-            )}
-            {activeTab === "history" && (
-              <Library
-                sessions={sessions}
-                activeSessionId={activeSessionId}
-                onSelectSession={setActiveSessionId}
-              />
-            )}
+            <Suspense
+              fallback={
+                <div className="h-56 grid place-items-center rounded-xl border border-zinc-800 bg-zinc-950 text-xs font-black uppercase tracking-widest italic text-zinc-500">
+                  Loading Module...
+                </div>
+              }
+            >
+              {activeTab === "dashboard" && <Dashboard activeSession={activeSession} />}
+              {activeTab === "telemetry" && (
+                <Telemetry rawTelemetry={activeSession?.data || []} profile={activeProfile} />
+              )}
+              {activeTab === "tuning" && (
+                <TuningLab
+                  settings={settings}
+                  setSettings={setSettings}
+                  rawTelemetry={activeSession?.data || []}
+                  profile={activeProfile}
+                />
+              )}
+              {activeTab === "garage" && (
+                <Garage
+                  profiles={BIKE_PROFILES}
+                  activeProfileId={activeProfileId}
+                  onSelectProfile={setActiveProfileId}
+                />
+              )}
+              {activeTab === "history" && (
+                <Library
+                  sessions={sessions}
+                  activeSessionId={activeSessionId}
+                  onSelectSession={setActiveSessionId}
+                />
+              )}
+            </Suspense>
           </div>
         </div>
       </main>

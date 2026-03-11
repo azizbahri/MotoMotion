@@ -1,0 +1,9 @@
+{
+  "name": "motomotion-workspace",
+  "private": true,
+  "scripts": {
+    "dev:adv": "npm --prefix adv-trace run dev -- --host 0.0.0.0 --port 5173 --strictPort",
+    "build:adv": "npm --prefix adv-trace run build",
+    "preview:adv": "npm --prefix adv-trace run preview"
+  }
+}
